@@ -7,14 +7,13 @@ class Task extends StatefulWidget {
   final String taskName;
   final String photo;
   final int difficulty;
-  const Task(this.taskName, this.photo, {super.key, required this.difficulty});
-
+  Task(this.taskName, this.photo, {super.key, required this.difficulty});
+  int level = 0;
   @override
   State<Task> createState() => _TaskState();
 }
 
 class _TaskState extends State<Task> {
-  int level = 0;
   Color _containerColor = Colors.blue;
 
   // Function to change the color
@@ -23,6 +22,13 @@ class _TaskState extends State<Task> {
     _containerColor =
         Colors.primaries[Random().nextInt(Colors.primaries.length)];
     return _containerColor;
+  }
+
+  assetOrNetwork() {
+    if (widget.photo.contains('http') || widget.photo.contains('https')) {
+      return false;
+    }
+    return true;
   }
 
   @override
@@ -57,10 +63,15 @@ class _TaskState extends State<Task> {
                     height: 100,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(4),
-                      child: Image.asset(
-                        widget.photo,
-                        fit: BoxFit.cover,
-                      ),
+                      child: assetOrNetwork()
+                          ? Image.asset(
+                              widget.photo,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.network(
+                              widget.photo,
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
                   Column(
@@ -85,9 +96,9 @@ class _TaskState extends State<Task> {
                     width: 68,
                     child: ElevatedButton(
                       onPressed: () => setState(() {
-                        level++;
-                        if (level == widget.difficulty * 10) {
-                          level = 0;
+                        widget.level++;
+                        if (widget.level == widget.difficulty * 10) {
+                          widget.level = 0;
                           _containerColor = _changeColor();
                         }
                       }),
@@ -114,7 +125,7 @@ class _TaskState extends State<Task> {
                     child: LinearProgressIndicator(
                       color: Colors.white,
                       value: widget.difficulty > 0
-                          ? (level / widget.difficulty) / 10
+                          ? (widget.level / widget.difficulty) / 10
                           : 1,
                     ),
                   ),
@@ -122,7 +133,7 @@ class _TaskState extends State<Task> {
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Text(
-                    'Level: $level',
+                    'Level: ${widget.level}',
                     style: const TextStyle(
                       fontSize: 18,
                       color: Colors.white,

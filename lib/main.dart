@@ -1,3 +1,5 @@
+import 'package:app_tasks_alura/data/task_inhetited.dart';
+import 'package:app_tasks_alura/screens/task_form.dart';
 import 'package:app_tasks_alura/screens/tasks.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +13,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'My Tasks',
+      // routes: {    forma mais dinâmica
+      //   '/': (context) => const Tasks(),
+      //   '/form': (context) => const TaskForm(),
+      // },
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -30,7 +36,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const Tasks(),
+      home: TaskInherited(
+        child: const Tasks(),
+      ),
     );
   }
 }
