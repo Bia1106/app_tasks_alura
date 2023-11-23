@@ -12,6 +12,18 @@ class Tasks extends StatefulWidget {
 
 class _TasksState extends State<Tasks> {
   bool opacity = true;
+  double levelSum = 0;
+  double progress = 0;
+
+  funcLevelSum() {
+    setState(() {
+      for (var task in TaskInherited.of(context)!.taskList) {
+        levelSum += (task.level * task.difficulty) / 10;
+      }
+      progress = levelSum / 100;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,27 +41,27 @@ class _TasksState extends State<Tasks> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Padding(
-                padding: EdgeInsets.only(right: 20.0),
+              Padding(
+                padding: const EdgeInsets.only(right: 20.0),
                 child: SizedBox(
                   width: 200,
                   child: LinearProgressIndicator(
                     color: Colors.white,
-                    value: 1,
+                    value: progress,
                   ),
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(right: 20.0),
+              Padding(
+                padding: const EdgeInsets.only(right: 20.0),
                 child: Text(
-                  'Teste',
-                  style: TextStyle(
+                  'Level: $levelSum',
+                  style: const TextStyle(
                     color: Colors.white,
                   ),
                 ),
               ),
               GestureDetector(
-                onTap: () => debugPrint('Clicked'),
+                onTap: () => funcLevelSum(),
                 child: const Icon(
                   Icons.refresh,
                   size: 26.0,
