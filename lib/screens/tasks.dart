@@ -1,4 +1,5 @@
 import 'package:app_tasks_alura/components/task.dart';
+import 'package:app_tasks_alura/data/task_dao.dart';
 import 'package:app_tasks_alura/data/task_inhetited.dart';
 import 'package:app_tasks_alura/screens/task_form.dart';
 import 'package:flutter/material.dart';
@@ -76,9 +77,77 @@ class _TasksState extends State<Tasks> {
         //se torna desnecessário quando as linhas 53 a 58 estão comentadas porém pretendo utilizar mais tarde com outro botão
         opacity: opacity ? 1 : 0,
         duration: const Duration(milliseconds: 2000),
-        child: ListView(
+        child: Padding(
           padding: const EdgeInsets.only(top: 8, bottom: 70),
-          children: TaskInherited.of(context)!.taskList,
+          child: FutureBuilder(
+              future: TaskDao().findAll(),
+              builder: (
+                context,
+                snapshot,
+              ) {
+                List<Task>? itens = snapshot.data;
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                    return const Center(
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          Text('Loading'),
+                        ],
+                      ),
+                    );
+                  case ConnectionState.waiting:
+                    return const Center(
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          Text('Loading'),
+                        ],
+                      ),
+                    );
+                  case ConnectionState.active:
+                    return const Center(
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          Text('Loading'),
+                        ],
+                      ),
+                    );
+                  case ConnectionState.done:
+                    if (snapshot.hasData && itens != null) {
+                      if (itens.isNotEmpty) {
+                        return ListView.builder(
+                            itemCount: itens.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final Task task = itens[index];
+                              return task;
+                            });
+                      } else {
+                        return const Center(
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.error_outlined,
+                                size: 128,
+                              ),
+                              Text(
+                                "There aren't any tasks",
+                                style: TextStyle(
+                                  fontSize: 32,
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      }
+                    } else {
+                      return const Text('Error loading tasks!');
+                    }
+                  default:
+                }
+                return const Text('Unknown error!');
+              }),
         ),
       ),
       // floatingActionButton: FloatingActionButton(
@@ -94,8 +163,8 @@ class _TasksState extends State<Tasks> {
             MaterialPageRoute(
                 builder: (contextNew) => TaskForm(
                       // nesse caso diferecia-se esse context para mostrar que está sendo buildado um contexto novo e como precisamos do contexto que vem de fora, o contexto da lista
-                      // muda-se o nome da variável pra ficar mais fácil a visualização de que o contexto passado para o TaskForm é o de Tasks e não o dele mesmo
-                      //(que é novo e não) contém as informações que precisamos
+                      // muda-se o nome da variável pra ficar mais fácil a visualização de que o contexto passado para o TaskForm é o de Tasks e não o dele mesmo,
+                      // que é novo e não contém as informações que precisamos
                       taskContext: context,
                     ))),
         child: const Icon(
